@@ -266,27 +266,35 @@ Handle<Value> Magic::Buffer( const Arguments& argv )
     Magic *m = ObjUnwrap( Magic, argv.This() );
     Handle<Value> retval = Undefined();
     int argc = argv.Length();
+    size_t len = 0;
+    const char *str = NULL;
     
     RetIfNotOpen( m );
     
     if( !argc ){
         retval = Throw( Str2Err( "undefined arguments" ));
     }
-    else if( !argv[0]->IsString() ){
-        retval = Throw(Str2TypeErr( "invalid type of arguments" ) );
-    }
-    else
+    else if( !argv[0]->IsString() )
     {
-        Local<String> str = argv[0]->ToString();
-        size_t len = str->Utf8Length();
+        if( !Buffer::HasInstance( argv[0] ) ){
+            retval = Throw(Str2TypeErr( "invalid type of arguments" ) );
+        }
+        else {
+            str = Buffer::Data( argv[0] );
+            len = Buffer::Length( argv[0] );
+        }
+    }
+    else {
+        str = *String::Utf8Value( argv[0]->ToString() );
+        len = argv[0]->ToString()->Utf8Length();
+    }
+    
+    if( len )
+    {
+        const char *mime = magic_buffer( m->magic, str, len );
         
-        if( len )
-        {
-            const char *mime = magic_buffer( m->magic, *String::Utf8Value( str ), len );
-            
-            if( mime ){
-                return scope.Close( String::New( mime ) );
-            }
+        if( mime ){
+            return scope.Close( String::New( mime ) );
         }
     }
     
