@@ -59,7 +59,7 @@ function test_file()
 function test_buffer()
 {
     var path = fs.realpathSync( './test.js' ),
-        str = fs.readFileSync( path, 'utf8' );
+        str = fs.readFileSync( path );
     
     console.log( 'buffer:', path, obj.buffer( str ) );
 }

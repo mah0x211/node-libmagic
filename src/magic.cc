@@ -274,19 +274,12 @@ Handle<Value> Magic::Buffer( const Arguments& argv )
     if( !argc ){
         retval = Throw( Str2Err( "undefined arguments" ));
     }
-    else if( !argv[0]->IsString() )
-    {
-        if( !Buffer::HasInstance( argv[0] ) ){
-            retval = Throw(Str2TypeErr( "invalid type of arguments" ) );
-        }
-        else {
-            str = Buffer::Data( argv[0] );
-            len = Buffer::Length( argv[0] );
-        }
+    else if( !Buffer::HasInstance( argv[0] ) ){
+        retval = Throw(Str2TypeErr( "invalid type of arguments" ) );
     }
     else {
-        str = *String::Utf8Value( argv[0]->ToString() );
-        len = argv[0]->ToString()->Utf8Length();
+        str = Buffer::Data( argv[0] );
+        len = Buffer::Length( argv[0] );
     }
     
     if( len )
